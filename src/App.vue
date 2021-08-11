@@ -7,6 +7,9 @@
 <script setup>
 import { ConfigProvider } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import moment from 'moment';
+import 'moment/dist/locale/zh-cn';
+moment.locale('en')
 </script>
 
 <style lang="scss">

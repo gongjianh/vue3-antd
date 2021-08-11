@@ -78,7 +78,21 @@ const list = ref([])
 const loadingT = ref(false)
 const formData: any = ref({})
 const url = computed(() => {
-    return setObjToUrlParams('/wgm-web/web/memberUserGiftBagReceive/getPropRecordExport', { ...formData.value, businessUserId: userInfo.value.userId })
+    return setObjToUrlParams('/wgm-web/web/memberUserGiftBagReceive/getPropRecordExport', {
+        pageIndex: pageOption.value.current,
+        pageSize: pageOption.value.pageSize,
+        ...formData.value,
+        businessUserId: userInfo.value.userId,
+        time: undefined,
+        beginTime:
+            formData.value.time && formData.value.time.length
+                ? moment(formData.value.time[0]).format('YYYY-MM-DD HH:mm:ss')
+                : undefined,
+        endTime:
+            formData.value.time && formData.value.time.length
+                ? moment(formData.value.time[1]).format('YYYY-MM-DD HH:mm:ss')
+                : undefined
+    })
 })
 const getList = async () => {
     loadingT.value = true
@@ -89,6 +103,7 @@ const getList = async () => {
             pageSize: pageOption.value.pageSize,
             ...formData.value,
             businessUserId: userInfo.value.userId,
+            time: undefined,
             beginTime:
                 formData.value.time && formData.value.time.length
                     ? moment(formData.value.time[0]).format('YYYY-MM-DD HH:mm:ss')
