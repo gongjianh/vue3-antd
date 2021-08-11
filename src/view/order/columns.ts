@@ -53,7 +53,14 @@ export const columns: TableColumn[] = [
     title: '状态',
     dataIndex: 'receiveStatus',
     customRender: ({ text, record }) => {
-      return text ? '已发货' : '未发货'
+      switch (text) {
+        //0待发货，1已发货，2已签收，3已结算',
+        case 0: return '未发货'
+        case 1: return '已发货'
+        case 2: return '已签收'
+        case 3: return '已结算'
+        default: return ''
+      }
     }
   },
   {

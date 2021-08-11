@@ -15,8 +15,10 @@
             </a-form-item>
             <a-form-item label="状态">
                 <a-select allowClear placeholder="请选择" v-model:value="formData.receiveStatus">
-                    <a-select-option value="1">发货</a-select-option>
                     <a-select-option value="0">未发货</a-select-option>
+                    <a-select-option value="1">已发货</a-select-option>
+                    <a-select-option value="2">已签收</a-select-option>
+                    <a-select-option value="3">已结算</a-select-option>
                 </a-select>
             </a-form-item>
             <a-form-item class="time" label="下单时间">
@@ -24,20 +26,20 @@
             </a-form-item>
             <a-form-item label=" " :colon="false">
                 <a-button type="primary" style="margin-right:12px" @click="search">搜索</a-button>
-                <a-button @click="reset">重置</a-button>
+                <a-button @click="fahuo">重置</a-button>
             </a-form-item>
         </a-form>
         <br />
         <div>
-            <a-button
+            <!-- <a-button
                 type="primary"
                 @click="fahuo(selectedRowKeys)"
                 :disabled="!selectedRowKeys.length"
             >批量发货</a-button>
             <span
                 style="font-weight: bold;margin-left: 20px;font-size: 16px;"
-            >当前已选择{{ selectedRowKeys.length }}项</span>
-            <a-button style="float: right;" type="primary" :href="url">导出</a-button>
+            >当前已选择{{ selectedRowKeys.length }}项</span>-->
+            <a-button type="primary" :href="url">导出</a-button>
         </div>
         <br />
         <a-table
@@ -46,22 +48,40 @@
             :pagination="pageOption"
             :data-source="list"
             rowKey="receiveId"
-            :row-selection="rowSelection"
         >
             <template #action="{ record }">
                 <a-button
                     v-if="record.receiveStatus == 0"
                     type="link"
-                    @click="fahuo(record.receiveId)"
+                    @click="fahuo(record)"
                     size="small"
                 >发货</a-button>
             </template>
         </a-table>
+        <a-modal
+            :confirmLoading="confirmLoading"
+            v-model:visible="visible"
+            width="400px"
+            title="发货"
+            @ok="handleOk"
+        >
+            <a-form
+                ref="formRef"
+                :model="formState"
+                :rules="rules"
+                :label-col="{ span: 6 }"
+                :wrapper-col="{ span: 15 }"
+            >
+                <a-form-item label="快递单号" name="expressNumber">
+                    <a-input placeholder="请填写" v-model:value="formState.expressNumber"></a-input>
+                </a-form-item>
+            </a-form>
+        </a-modal>
     </a-card>
 </template>
   <script lang="ts" setup>
 import { ref, createVNode, computed } from 'vue'
-import { usePages } from '@/hooks'
+import { useFormModal, usePages } from '@/hooks'
 import { columns } from './columns'
 import http from '@/utils/http'
 import moment from 'moment'
@@ -69,7 +89,7 @@ import { message, Modal } from 'ant-design-vue'
 import { QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { setObjToUrlParams } from '@/utils/urlUtils'
 import userInfo from '@/store/userInfo'
-
+import { getFormSchema } from './form-schema'
 
 
 
@@ -144,23 +164,55 @@ const rowSelection = {
         }
     }
 }
+const formRef = ref()
+const confirmLoading = ref(false)
+const visible = ref(false)
+const formState = ref({
+    expressNumber: '',
+    receiveId: ''
+})
+const rules = {
+    expressNumber: [{
+        required: true,
+        message: "请填写"
+    }]
+}
+async function handleOk(item) {
+    await formRef.value.validate()
+    confirmLoading.value = true
+    const res = await http({
+        url: '/wgm-web/web/memberUserGiftBagReceive/updateReceiveStatus',
+        params: {
+            receiveId: formState.value.receiveId,
+            expressNumber: formState.value.expressNumber
+        }
+    })
+    confirmLoading.value = false
+    if (res.status === 0) {
+        visible.value = false
+        message.success('发货成功！')
+        getList()
+    }
+}
 
-
-async function fahuo(data) {
-    Modal.confirm({
-        icon: createVNode(QuestionCircleOutlined),
-        content: `您确定要发货吗？`,
-        onOk: async () => {
+async function fahuo(item) {
+    // visible.value = true
+    // formState.value.receiveId = item.receiveId
+    // return
+    useFormModal({
+        title: '发货',
+        formSchema: getFormSchema(),
+        handleOk: async (state) => {
             const res = await http({
-                url: '/wgm-web/web/memberUserGiftBagReceive/updateReceiveStatus',
+                url: '/web/memberUserGiftBagReceive/updateReceiveStatus',
                 params: {
-                    receiveIdList: data.toString()
+                    receiveId: item.receiveId,
+                    expressNumber: state.expressNumber
                 }
             })
             if (res.status === 0) {
                 message.success('发货成功！')
                 getList()
-                selectedRowKeys.value = []
             }
         }
     })

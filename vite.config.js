@@ -27,7 +27,7 @@ export default ({ command, mode }) => {
           // rewrite: (path) => path.replace(/^\/api/, '/api/v1')
         },
         "/wgm-web": {
-          target: "http://120.26.87.100",
+          target: "http://192.168.0.191:8084",
           changeOrigin: true,
         },
       },

@@ -9,7 +9,7 @@ export const getFormSchema = (): FormSchema => ({
     },
     formItemLayout: {
         labelCol: {
-            span: 5
+            span: 6
         },
         wrapperCol: {
             span: 15
@@ -18,19 +18,16 @@ export const getFormSchema = (): FormSchema => ({
     formItem: [
         {
             type: "input",
-            label: "权重值",
-            field: "weight",
+            label: "快递单号",
+            field: "expressNumber",
             value: '',
             props: {
-                placeholder: "请输入权重值"
+                placeholder: "请输入快递单号"
             },
             rules: [
                 {
                     required: true,
                     message: "请填写"
-                }, {
-                    validator: isnumber,
-                    trigger: 'blur'
                 }
             ]
         }

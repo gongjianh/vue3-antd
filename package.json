@@ -8,10 +8,8 @@
   },
   "dependencies": {
     "@ant-design-vue/use": "^0.0.1-alpha.10",
-    "ant-design-vue": "^2.2.4",
+    "ant-design-vue": "^2.1.2",
     "axios": "^0.21.1",
-    "element-plus": "^1.0.2-beta.70",
-    "element3": "^0.0.40",
     "qs": "^6.10.1",
     "sass": "^1.26.10",
     "sass-loader": "^10.0.2",
